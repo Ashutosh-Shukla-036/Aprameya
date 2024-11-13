@@ -1,0 +1,19 @@
+# .gitignore
+
+# Node.js dependencies
+node_modules/
+
+# Build output
+/dist/
+
+# IDE/editor folders
+.vscode/
+.idea/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+
+# OS-specific files
+.DS_Store
+Thumbs.db
