@@ -1,0 +1,35 @@
+# Node.js dependencies
+node_modules/
+
+# Build output
+/dist/
+/build/
+
+# Vite cache (if using Vite)
+.vite/
+
+# TypeScript config and compiled files
+*.tsbuildinfo
+*.d.ts
+*.js
+
+# Local environment files
+.env
+.env.*.local
+
+# IDE/editor folders
+.vscode/
+.idea/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Operating system files
+.DS_Store      # macOS
+Thumbs.db      # Windows
+
+# Package lock or yarn lock (if you want to prevent version conflicts)
+package-lock.json  # Optional: If you're using yarn, you can ignore yarn.lock
+yarn.lock         # Optional: If you're using npm, you can ignore package-lock.json
