@@ -7,9 +7,7 @@ const fileSchema = new Schema({
     director: { type: String, required: true},
     releaseDate : { type: String, required: true},
     link: { type: String, required: true},
-    cast : { type: Map,
-        of: String,
-        required: true },
+    cast: { type: [String], required: true },
     crew: { 
         dop: { type: String },
         editing: { type: String },
