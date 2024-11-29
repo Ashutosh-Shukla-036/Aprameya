@@ -8,6 +8,7 @@ const fileSchema = new Schema({
     releaseDate : { type: String, required: true},
     link: { type: String, required: true},
     cast: { type: [String], required: true },
+    averageRating: { type: Number, default: 0 },
     crew: { 
         dop: { type: String },
         editing: { type: String },
