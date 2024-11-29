@@ -1,5 +1,5 @@
 import express  from "express";
-import { addOrUpdateRating, getRating } from "../controllers/ratingreviewControlller";
+import { addOrUpdateRating, getRating } from "../controllers/ratingController";
 const route = express.Router();
 
 route.post("/addrating", addOrUpdateRating);
