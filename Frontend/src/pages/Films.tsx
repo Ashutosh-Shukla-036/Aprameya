@@ -4,12 +4,13 @@ import FirstMovie from '../assets/FirstMovie.jpg';
 import SecondMovie from '../assets/SecondMovie.jpg';
 import ThirdMovie from '../assets/ThirdMovie.jpg';
 import FourthMovie from '../assets/FourthMovie.jpg';
-import ReactStars from "react-stars";
+import { Rating } from '@mui/material'; // Import Rating from MUI
 import { useState, useEffect } from "react";
 import { UserAtom } from "../Atoms/UserAtom";
 import { useNavigate } from "react-router-dom"; // Import useNavigate
 
 interface Film {
+    _id: string; // Assuming the film has an _id for backend interaction
     title: string;
     description: string;
     genre: string;
@@ -17,6 +18,8 @@ interface Film {
     releaseDate: string;
     link: string;
     cast: string[];
+    averageRating?: number; // Optional, if fetched from the backend or already in FilmAtom
+    ratingCount?: number;
     crew?: {
         dop?: string;
         editing?: string;
@@ -32,7 +35,7 @@ interface Film {
 }
 
 export const Film: React.FC = () => {
-    const films = useRecoilValue(FilmAtom);
+    const films = useRecoilValue(FilmAtom); // Already contains average rating
     const user = useRecoilValue(UserAtom); // To check if the user is logged in
     const navigate = useNavigate(); // Hook to navigate
     const [selectedGenre, setSelectedGenre] = useState<string>("All");
@@ -74,11 +77,6 @@ export const Film: React.FC = () => {
         if (!watchlist.some(f => f.title === film.title)) {
             setWatchlist(prev => [...prev, film]);
         }
-    };
-
-    const handleRatingChange = (newRating: number, title: string) => {
-        console.log(`Rated ${title} with ${newRating} stars`);
-        // Here you can save the rating to the backend or local state
     };
 
     return (
@@ -154,35 +152,49 @@ export const Film: React.FC = () => {
                             </div>
                         )}
 
-                        {/* Rating - Only if the user is logged in */}
+                        {/* Average Rating */}
                         <div className="mb-4">
-                            <h3 className="text-lg font-bold text-teal-300 mb-2">Rating:</h3>
-                            <ReactStars
-                                count={5}
-                                value={0}  // default value (can be fetched or stored)
-                                onChange={user ? (newRating) => handleRatingChange(newRating, film.title) : () => navigate('/signup')} // Navigate to '/signup' if not logged in
-                                size={24}
-                                color2={"#ffd700"}
-                            />
+                            <h3 className="text-lg font-bold text-teal-300 mb-2">Average Rating:</h3>
+                            <div className="flex items-center">
+                                {/* Show the average rating */}
+                                <p className="mr-2 text-lg text-yellow-300">
+                                    {film.averageRating ? film.averageRating.toFixed(1) : 'N/A'}
+                                </p>
+                                <Rating
+                                    name="film-rating"
+                                    value={film.averageRating || 0} // Display average rating
+                                    precision={0.5}
+                                    readOnly // Make average rating read-only
+                                    sx={{
+                                        '& .MuiRating-iconEmpty': { color: 'white' },
+                                        '& .MuiRating-iconFilled': { color: '#facc15' },
+                                        '& .MuiRating-iconHover': { color: '#fde047' },
+                                    }}
+                                />
+                            </div>
+                            {/* Show the number of ratings */}
+                            {film.ratingCount !== undefined && (
+                                <p className="text-sm text-gray-400 mt-1">
+                                    Rated by <span className="text-yellow-300">{film.ratingCount}</span> people
+                                </p>
+                            )}
                         </div>
 
-                        {/* Add to Watchlist */}
-                        <button
-                            className="mt-4 inline-block px-4 py-2 bg-teal-500 text-white rounded-lg hover:bg-teal-400 transition duration-300"
-                            onClick={() => handleAddToWatchlist(film)} // Only allows adding if logged in
-                        >
-                            Add to Watchlist
-                        </button>
+                        {/* Watch Now and Add to Watchlist Buttons */}
+                        <div className="flex justify-between items-center">
+                            {/* Watch Now Button */}
+                            <a href={film.link} className="bg-teal-500 text-white py-2 px-4 rounded-md hover:bg-yellow-500">
+                                Watch Now
+                            </a>
 
-                        {/* Watch Link */}
-                        <a
-                            href={film.link}
-                            className="inline-block ml-12 mt-4 px-4 py-2 bg-yellow-400 text-gray-900 font-semibold rounded-lg hover:bg-teal-400 hover:text-white transition duration-300"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                        >
-                            Watch Now
-                        </a>
+                            {/* Add to Watchlist Button */}
+                            <button 
+                                className="bg-yellow-500 text-white py-2 px-4 rounded-md hover:bg-teal-400"
+                                onClick={() => handleAddToWatchlist(film)}
+                            >
+                                {watchlist.some(f => f.title === film.title) ? 'Added to Watchlist' : 'Add to Watchlist'}
+                            </button>
+                        </div>
                     </div>
                 ))}
             </div>
