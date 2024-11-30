@@ -1,6 +1,8 @@
 import express, { Request, Response } from 'express';
 import filmRoute from "./routes/filmRoute";
 import userRoute from "./routes/userRoute";
+import ratingRoute from "./routes/ratingRoute";
+import reviewRoute from "./routes/reviewRoute"
 import { ConnectDB } from './db';
 import cors from 'cors';
 
@@ -17,6 +19,8 @@ app.get('/', (req: Request, res: Response) => {
 
 app.use('/api/user',userRoute);
 app.use('/api/films',filmRoute);
+app.use('/api/rating', ratingRoute);
+app.use('/api/review', reviewRoute);
 
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
