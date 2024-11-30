@@ -24,6 +24,10 @@ export const addOrUpdateRating = async (req: Request, res: Response) => {
         } else {
             const newRating = new Rating({ user: userId, film: filmId, rating });
             await newRating.save();
+
+            await Film.findByIdAndUpdate(filmId, {
+                $inc: { ratingCount : 1 },
+            });
         }
 
         await updateFilmAverageRating(filmId);
