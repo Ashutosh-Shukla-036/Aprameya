@@ -9,6 +9,7 @@ const fileSchema = new Schema({
     link: { type: String, required: true},
     cast: { type: [String], required: true },
     averageRating: { type: Number, default: 0 },
+    ratingCount: { type: Number, default: 0 },
     crew: { 
         dop: { type: String },
         editing: { type: String },
