@@ -1,6 +1,7 @@
 import { atom } from "recoil";
 
 interface Film {
+    _id: any;
     title: string;
     description: string;
     genre: string;
@@ -8,6 +9,8 @@ interface Film {
     releaseDate: string;
     link: string;
     cast: string[];
+    averageRating?: number;
+    ratingCount?: number,
     crew?: {
         dop?: string;
         editing?: string;
