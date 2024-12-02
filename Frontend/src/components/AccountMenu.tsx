@@ -9,15 +9,16 @@ import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import Logout from '@mui/icons-material/Logout';
-import FavoriteIcon from '@mui/icons-material/Favorite';
 import StarIcon from '@mui/icons-material/Star';
 import MovieIcon from '@mui/icons-material/Movie';
 import SettingsIcon from '@mui/icons-material/Settings';
 import HomeIcon from '@mui/icons-material/Home';
 import { useSetRecoilState } from 'recoil';
 import { UserAtom } from '../Atoms/UserAtom';
+import { useNavigate } from 'react-router-dom';
 
 export default function AccountMenu() {
+  const navigate = useNavigate();
   const setUser = useSetRecoilState(UserAtom);
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
@@ -34,7 +35,7 @@ export default function AccountMenu() {
     localStorage.removeItem('username'); // Clear stored user data
     localStorage.removeItem('token');
     setUser(null); // Reset user state
-    console.log('User logged out');
+    navigate("/");
   };
 
   return (
@@ -92,7 +93,9 @@ export default function AccountMenu() {
         anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
       >
         <MenuItem
-          onClick={handleClose}
+          onClick={() => {
+            handleClose(), navigate("/")}
+          }
           sx={{
             '&:hover': {
               backgroundColor: '#404040',
@@ -106,21 +109,9 @@ export default function AccountMenu() {
           Home
         </MenuItem>
         <MenuItem
-          onClick={handleClose}
-          sx={{
-            '&:hover': {
-              backgroundColor: '#404040',
-              color: '#FFFFFF',
-            },
-          }}
-        >
-          <ListItemIcon>
-            <FavoriteIcon sx={{ color: '#FFFFFF' }} />
-          </ListItemIcon>
-          Favorites
-        </MenuItem>
-        <MenuItem
-          onClick={handleClose}
+          onClick={() => {
+            handleClose() , navigate("/review")}
+          }
           sx={{
             '&:hover': {
               backgroundColor: '#404040',
@@ -131,7 +122,7 @@ export default function AccountMenu() {
           <ListItemIcon>
             <StarIcon sx={{ color: '#FFFFFF' }} />
           </ListItemIcon>
-          Ratings & Reviews
+          Your Reviews
         </MenuItem>
         <MenuItem
           onClick={handleClose}
