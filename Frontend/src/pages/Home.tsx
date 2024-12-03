@@ -1,5 +1,7 @@
+import * as React from 'react';
 import { useRecoilState } from 'recoil';
 import { FilmAtom } from '../Atoms/FilmAtom';
+import { ReviewAtom } from '../Atoms/ReviewAtom';
 import { useEffect, useRef } from 'react';
 import APlogo from '../assets/APLogo.jpg';
 import FirstMovie from '../assets/FirstMovie.jpg';
@@ -7,9 +9,13 @@ import SecondMovie from '../assets/SecondMovie.jpg';
 import ThirdMovie from '../assets/ThirdMovie.jpg';
 import FourthMovie from '../assets/FourthMovie.jpg';
 import { useNavigate } from 'react-router-dom';
+import Card from '@mui/material/Card';
+import CardContent from '@mui/material/CardContent';
+import Typography from '@mui/material/Typography';
 
 const Home: React.FC = () => {
     const [films, setFilms] = useRecoilState(FilmAtom);
+    const [reviews, setReviews] = useRecoilState(ReviewAtom);
     const navigate = useNavigate();
     const filmRef = useRef<HTMLDivElement>(null);
 
@@ -21,7 +27,7 @@ const Home: React.FC = () => {
     };
 
     const getThumbnailPath = (title: string): string => {
-        return thumbnailMap[title] || `/src/assets/APLogo.jpg`; 
+        return thumbnailMap[title] || APlogo;
     };
 
     useEffect(() => {
@@ -35,16 +41,27 @@ const Home: React.FC = () => {
             }
         };
 
+        const fetchReviews = async () => {
+            try {
+                const result = await fetch("http://localhost:5002/api/review/getreviews");
+                const reviews = await result.json();
+                setReviews(reviews);
+            } catch (error) {
+                console.error("Error fetching reviews:", error);
+            }
+        };
+
         fetchFilms();
-    }, [setFilms]);
+        fetchReviews();
+    }, [setFilms, setReviews]);
 
     const scrollToFilms = () => {
         filmRef.current?.scrollIntoView({ behavior: "smooth" });
     };
 
     const handleSeeInDetail = (title: string) => {
-        navigate(`/film/${title}`)
-    }
+        navigate(`/film/${title}`);
+    };
 
     return (
         <>
@@ -101,11 +118,11 @@ const Home: React.FC = () => {
                                 {film.description.substring(0, 100)}...
                             </p>
                             <div className="flex justify-between items-center mt-4">
-                                <button 
+                                <button
                                     onClick={() => handleSeeInDetail(film.title)}
                                     className="px-4 py-2 bg-teal-500 text-white rounded-lg hover:bg-yellow-400 transition duration-300"
                                 >
-                                    see in Detail
+                                    See in Detail
                                 </button>
                                 <a
                                     href={film.link}
@@ -118,6 +135,84 @@ const Home: React.FC = () => {
                             </div>
                         </div>
                     ))}
+                </div>
+            </section>
+
+            {/* Reviews Section */}
+            <section className="bg-charcoal-metallic-dark py-12 px-6">
+                <h2 className="text-3xl font-bold text-yellow-400 text-center mb-8">
+                    What Our Viewers Say
+                </h2>
+                {reviews.length > 0 ? (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+                        {reviews.slice(0, 3).map((review, index) => (
+                            <Card
+                                key={index}
+                                sx={{
+                                    backgroundColor: '#333',
+                                    borderRadius: '8px',
+                                    boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.2)',
+                                }}
+                            >
+                                <CardContent sx={{ position: 'relative' }}>
+                                    {/* Username in top-right corner */}
+                                    <Typography
+                                        sx={{
+                                            position: 'absolute',
+                                            top: 8,
+                                            right: 16,
+                                            color: 'gray',
+                                            fontSize: 12,
+                                            fontStyle: 'italic',
+                                        }}
+                                    >
+                                        - {review.username}
+                                    </Typography>
+                                    {/* Film title */}
+                                    <Typography
+                                        variant="h6"
+                                        component="div"
+                                        sx={{
+                                            color: '#ffca28',
+                                            fontWeight: 'bold',
+                                            marginBottom: 1,
+                                        }}
+                                    >
+                                        {review.FilmTitle}
+                                    </Typography>
+                                    {/* Review text */}
+                                    <Typography
+                                        variant="body1"
+                                        sx={{
+                                            color: 'white',
+                                            fontStyle: 'italic',
+                                            marginBottom: 2,
+                                        }}
+                                    >
+                                        "{review.review}"
+                                    </Typography>
+                                </CardContent>
+                            </Card>
+                        ))}
+                    </div>
+                ) : (
+                    <div className="text-center mt-8">
+                        <p className="text-xl text-gray-300">No reviews available yet.</p>
+                        <a
+                            href="/reviews"
+                            className="px-6 py-3 bg-teal-500 text-white font-semibold rounded-full shadow-lg hover:bg-yellow-400 hover:text-gray-900 transition duration-300 text-center"
+                        >
+                            Be the first to add a review
+                        </a>
+                    </div>
+                )}
+                <div className="flex justify-center mt-8">
+                    <a
+                        href="/reviews"
+                        className="px-6 py-3 bg-teal-500 text-white font-semibold rounded-full shadow-lg hover:bg-yellow-400 hover:text-gray-900 transition duration-300 text-center"
+                    >
+                        See All Reviews or Add Review
+                    </a>
                 </div>
             </section>
         </>
