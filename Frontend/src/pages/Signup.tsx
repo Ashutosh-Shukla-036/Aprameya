@@ -2,36 +2,50 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { HiOutlineUserCircle, HiOutlineMail, HiOutlineLockClosed } from "react-icons/hi";
 import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
+import Alert from "@mui/material/Alert";
 
 const SignUp: React.FC = () => {
     const navigate = useNavigate();
     const [username, setUsername] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-    const [error, setError] = useState(false);
+    const [error, setError] = useState<string | string[] | null>(null);
     const [showPassword, setShowPassword] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
 
     const handleSignup = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsLoading(true);
-        setError(false);
+        setError(null);
+
         try {
             const response = await axios.post("http://localhost:5002/api/user/signup", {
                 username,
                 email,
                 password,
             });
+
             if (response.data.success) {
-                navigate("/login");
                 alert("Signup successful!");
+                navigate("/login");
             } else {
                 setError(response?.data?.message || "Signup failed.");
             }
-        } catch (error: any) {
-            console.log(error);
-            setError(error?.response?.data?.message || "An error occurred during signup.");
+        } catch (err) {
+            console.error(err);
+
+            // Handle error using AxiosError type
+            const axiosError = err as AxiosError<{
+                message?: string | string[];
+                errors?: string | string[];
+            }>;
+
+            setError(
+                axiosError?.response?.data?.errors ||
+                axiosError?.response?.data?.message ||
+                "An error occurred."
+            );
         } finally {
             setIsLoading(false);
         }
@@ -46,22 +60,23 @@ const SignUp: React.FC = () => {
                 Create Your Account
             </h2>
 
-            {error && Array.isArray(error) ? (
-                <div className="bg-red-200 text-red-800 p-3 rounded-md mb-4 text-center font-semibold shadow-md">
-                    {error.map((err: { message: string }, index: number) => (
-                        <p key={index}>{err.message}</p>
-                    ))}
-                </div>
-            ) : error ? (
-                <p className="bg-red-200 text-red-800 p-3 rounded-md mb-4 text-center font-semibold shadow-md">
-                    {error}
-                </p>
-            ) : null }
-
+            {error && (
+                <Alert severity="error" role="alert" className="mb-4">
+                    {Array.isArray(error) ? (
+                        <ul>
+                            {error.map((err, index) => (
+                                <li key={index}>{err}</li>
+                            ))}
+                        </ul>
+                    ) : (
+                        error
+                    )}
+                </Alert>
+            )}
 
             {/* Username Field */}
             <div className="mb-6 relative">
-                <label className="block text-white font-medium mb-2">
+                <label htmlFor="username" className="block text-white font-medium mb-2">
                     Username <span className="text-red-400">*</span>
                 </label>
                 <div className="relative">
@@ -69,19 +84,21 @@ const SignUp: React.FC = () => {
                         <HiOutlineUserCircle className="text-white/80 h-6 w-6" />
                     </span>
                     <input
+                        id="username"
                         type="text"
                         value={username}
                         onChange={(e) => setUsername(e.target.value)}
                         className="w-full p-3 pl-12 border border-orange-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 bg-white/80 shadow-md dark:bg-gray-900 dark:border-gray-700 dark:focus:ring-orange-600 dark:text-white"
                         placeholder="Enter your username"
                         required
+                        aria-label="Username"
                     />
                 </div>
             </div>
 
             {/* Email Field */}
             <div className="mb-6 relative">
-                <label className="block text-white font-medium mb-2">
+                <label htmlFor="email" className="block text-white font-medium mb-2">
                     Email <span className="text-red-400">*</span>
                 </label>
                 <div className="relative">
@@ -89,19 +106,21 @@ const SignUp: React.FC = () => {
                         <HiOutlineMail className="text-white/80 h-6 w-6" />
                     </span>
                     <input
+                        id="email"
                         type="email"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         className="w-full p-3 pl-12 border border-orange-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 bg-white/80 shadow-md dark:bg-gray-900 dark:border-gray-700 dark:focus:ring-orange-600 dark:text-white"
                         placeholder="Enter your email"
                         required
+                        aria-label="Email"
                     />
                 </div>
             </div>
 
             {/* Password Field */}
             <div className="mb-6 relative">
-                <label className="block text-white font-medium mb-2">
+                <label htmlFor="password" className="block text-white font-medium mb-2">
                     Password <span className="text-red-400">*</span>
                 </label>
                 <div className="relative">
@@ -109,12 +128,14 @@ const SignUp: React.FC = () => {
                         <HiOutlineLockClosed className="text-white/80 h-6 w-6" />
                     </span>
                     <input
+                        id="password"
                         type={showPassword ? "text" : "password"}
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         className="w-full p-3 pl-12 border border-orange-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 bg-white/80 shadow-md dark:bg-gray-900 dark:border-gray-700 dark:focus:ring-orange-600 dark:text-white"
                         placeholder="Enter your password"
                         required
+                        aria-label="Password"
                     />
                     <span
                         onClick={() => setShowPassword((prev) => !prev)}
