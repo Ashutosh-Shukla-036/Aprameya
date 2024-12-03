@@ -5,6 +5,7 @@ import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
 import axios from "axios";
 import { useSetRecoilState } from "recoil";
 import { UserAtom } from "../Atoms/UserAtom";
+import Alert from "@mui/material/Alert";
 
 const Login: React.FC = () => {
     const navigate = useNavigate();
@@ -12,6 +13,7 @@ const Login: React.FC = () => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState(false);
+    const [successMessage, setSuccessMessage] = useState("");
     const [showPassword, setShowPassword] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
 
@@ -19,32 +21,36 @@ const Login: React.FC = () => {
         e.preventDefault();
         setIsLoading(true);
         setError(false);
+        setSuccessMessage("");
         try {
             const response = await axios.post("http://localhost:5002/api/user/login", {
                 email,
                 password,
             });
             if (response?.data?.userId) {
-                navigate("/");
-                console.log(response.data);
+                setSuccessMessage("Logged in successfully.");
+                setTimeout(() => {
+                    navigate("/");
+                }, 1000);
                 localStorage.setItem("token", response?.data?.token);
-                localStorage.setItem("user", JSON.stringify({
-                    username: response?.data?.username,
-                    email: response?.data?.email,
-                    userId: response?.data?.userId
-                }))
+                localStorage.setItem(
+                    "user",
+                    JSON.stringify({
+                        username: response?.data?.username,
+                        email: response?.data?.email,
+                        userId: response?.data?.userId,
+                    })
+                );
                 setUser({
                     username: response?.data?.username,
                     email: response?.data?.email,
-                    userId: response?.data?.userId
+                    userId: response?.data?.userId,
                 });
-                alert("Login successful!");
             } else {
-                console.log(response.data);
                 setError(response?.data?.message || "Login failed.");
             }
         } catch (error: any) {
-            console.log(error);
+            console.error(error);
             setError(error.response?.data?.message || "An error occurred during login.");
         } finally {
             setIsLoading(false);
@@ -61,9 +67,14 @@ const Login: React.FC = () => {
             </h2>
 
             {error && (
-                <p className="bg-red-200 text-red-800 p-3 rounded-md mb-4 text-center font-semibold shadow-md">
+                <Alert severity="error" className="mb-4">
                     {error}
-                </p>
+                </Alert>
+            )}
+            {successMessage && (
+                <Alert severity="success" className="mb-4">
+                    {successMessage}
+                </Alert>
             )}
 
             {/* Email Field */}
