@@ -45,9 +45,12 @@ export const Footer: React.FC = () => {
         <div className="text-center mb-6 md:mb-0">
           <h2 className="text-xl font-semibold mb-2">Collaborate With Me</h2>
           <p className="mb-2">I’m open to collaboration on exciting projects. If you have an idea or would like to work together, feel free to reach out!</p>
-          <Link to="/contact" className="text-blue-500 hover:text-blue-400 transition dark:text-blue-400 dark:hover:text-blue-300">
+          <a
+            href="mailto:locusproductions2023@gmail.com"
+            className="text-blue-500 hover:text-blue-400 transition dark:text-blue-400 dark:hover:text-blue-300"
+          >
             Get in Touch
-          </Link>
+          </a>
         </div>
       </div>
 
