@@ -8,7 +8,7 @@ import FirstMovie from '../assets/FirstMovie.jpg';
 import SecondMovie from '../assets/SecondMovie.jpg';
 import ThirdMovie from '../assets/ThirdMovie.jpg';
 import FourthMovie from '../assets/FourthMovie.jpg';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
@@ -124,6 +124,9 @@ const Home: React.FC = () => {
                                 >
                                     See in Detail
                                 </button>
+                                {/*<a href={`/film/${film.title}`} className="px-4 py-2 bg-teal-500 text-white rounded-lg hover:bg-yellow-400 transition duration-300">
+                                    See in Detail
+                                </a>8*/}
                                 <a
                                     href={film.link}
                                     className="px-4 py-2 bg-yellow-400 text-gray-900 font-semibold rounded-lg hover:bg-teal-400 hover:text-white transition duration-300"
@@ -198,21 +201,21 @@ const Home: React.FC = () => {
                 ) : (
                     <div className="text-center mt-8">
                         <p className="text-xl text-gray-300">No reviews available yet.</p>
-                        <a
-                            href="/reviews"
+                        <Link
+                            to="/reviews"
                             className="px-6 py-3 bg-teal-500 text-white font-semibold rounded-full shadow-lg hover:bg-yellow-400 hover:text-gray-900 transition duration-300 text-center"
                         >
                             Be the first to add a review
-                        </a>
+                        </Link>
                     </div>
                 )}
                 <div className="flex justify-center mt-8">
-                    <a
-                        href="/reviews"
+                    <Link
+                        to="/reviews"
                         className="px-6 py-3 bg-teal-500 text-white font-semibold rounded-full shadow-lg hover:bg-yellow-400 hover:text-gray-900 transition duration-300 text-center"
                     >
                         See All Reviews or Add Review
-                    </a>
+                    </Link>
                 </div>
             </section>
         </>
