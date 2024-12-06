@@ -9,29 +9,8 @@ import { UserAtom } from "../Atoms/UserAtom";
 import { useNavigate, useParams } from "react-router-dom";
 import Rating from '@mui/material/Rating';
 import axios from 'axios'; // Import axios
-
-interface Film {
-    title: string;
-    description: string;
-    genre: string;
-    director: string;
-    releaseDate: string;
-    link: string;
-    cast: string[];
-    averageRating: number;
-    crew?: {
-        dop?: string;
-        editing?: string;
-        dialogues?: string;
-        story?: string;
-        assistantDirectors?: string[];
-        coDirector?: string;
-        executiveProducer?: string;
-        coProducer?: string;
-        producer?: string;
-        music?: string;
-    };
-}
+import Snackbar from "@mui/material/Snackbar";
+import SnackbarContent from "@mui/material/SnackbarContent";
 
 const FilmDetail: React.FC = () => {
     const { title } = useParams<{ title: string }>();
@@ -40,6 +19,11 @@ const FilmDetail: React.FC = () => {
     const navigate = useNavigate();
     const [rating, setRating] = useState<number | null>(null);
     const [isRatingUpdated, setIsRatingUpdated] = useState<boolean>(false);
+
+    // Snackbar state
+    const [snackbarOpen, setSnackbarOpen] = useState<boolean>(false);
+    const [snackbarMessage, setSnackbarMessage] = useState<string>("");
+    const [snackbarSeverity, setSnackbarSeverity] = useState<"success" | "error">("success");
 
     const thumbnailMap: { [title: string]: string } = {
         "Safe Space": FirstMovie,
@@ -54,16 +38,24 @@ const FilmDetail: React.FC = () => {
 
     const selectedFilm = films.find(film => film.title === title);
 
+    const handleSnackbarClose = () => {
+        setSnackbarOpen(false);
+    };
+
     const handleAddToWatchlist = () => {
         if (!user) {
-            navigate('/signup');
+            navigate("/signup");
             return;
         }
+        // Show snackbar for adding to watchlist
+        setSnackbarMessage("Added to your Watchlist!");
+        setSnackbarSeverity("success");
+        setSnackbarOpen(true);
     };
 
     const handleRatingChange = async (newRating: number | null, title: string) => {
         if (!user) {
-            navigate('/signup');
+            navigate("/signup");
             return;
         }
 
@@ -79,8 +71,18 @@ const FilmDetail: React.FC = () => {
 
             setIsRatingUpdated(true); // Mark rating as updated
             console.log(`Rated ${title} with ${newRating} stars`);
+
+            // Show snackbar for successful rating
+            setSnackbarMessage(`You rated "${title}" ${newRating} stars!`);
+            setSnackbarSeverity("success");
+            setSnackbarOpen(true);
         } catch (error) {
             console.error("Error rating the film:", error);
+
+            // Show snackbar for error
+            setSnackbarMessage("Failed to submit your rating. Please try again.");
+            setSnackbarSeverity("error");
+            setSnackbarOpen(true);
         }
     };
 
@@ -101,7 +103,6 @@ const FilmDetail: React.FC = () => {
                 const result = await fetch("http://localhost:5002/api/films/getfilms");
                 const films = await result.json();
                 setFilms(films);
-                //console.log(films);
             } catch (error) {
                 console.error("Error fetching films:", error);
             }
@@ -120,25 +121,17 @@ const FilmDetail: React.FC = () => {
     return (
         <div className="bg-gray-900 text-white py-12 px-6">
             <div className="bg-gray-800 p-6 rounded-lg shadow-lg mx-auto max-w-4xl mt-20 md:mt-0">
-                {/* Thumbnail */}
                 <img
                     src={getThumbnailPath(selectedFilm?.title)}
                     alt={selectedFilm?.title}
                     className="w-full h-64 object-cover rounded-lg mb-4 transition-transform duration-300 transform hover:scale-105 hover:brightness-90"
                 />
-                
-                {/* Film Title */}
                 <h2 className="text-4xl font-bold text-yellow-300 mb-2">{selectedFilm?.title}</h2>
-                
-                {/* Details */}
                 <p className="text-gray-400 text-sm mb-2">Release Date: {selectedFilm?.releaseDate}</p>
                 <p className="text-gray-400 text-sm mb-2">Genre: <span className="text-yellow-300">{selectedFilm?.genre}</span></p>
                 <p className="text-gray-400 text-sm mb-4">Directed by: <span className="text-white">{selectedFilm?.director}</span></p>
-                
-                {/* Description */}
                 <p className="text-gray-300 text-base mb-4">{selectedFilm?.description}</p>
 
-                {/* Cast */}
                 <div className="mb-4">
                     <h3 className="text-lg font-bold text-teal-300 mb-2">Cast:</h3>
                     <ul className="list-disc list-inside text-gray-300">
@@ -148,7 +141,6 @@ const FilmDetail: React.FC = () => {
                     </ul>
                 </div>
 
-                {/* Crew */}
                 {selectedFilm.crew && (
                     <div className="mb-4">
                         <h3 className="text-lg font-bold text-teal-300 mb-2">Crew:</h3>
@@ -173,51 +165,39 @@ const FilmDetail: React.FC = () => {
                     </div>
                 )}
 
-                {/* Average Rating */}
                 <div className="mb-4">
                     <h3 className="text-lg font-bold text-teal-300 mb-2">Average Rating:</h3>
                     <div className="flex items-center">
-                        <p className="mr-2 text-lg text-yellow-300">{selectedFilm?.averageRating ? selectedFilm?.averageRating?.toFixed(1) : 'N/A'}</p>
+                        <p className="mr-2 text-lg text-yellow-300">{selectedFilm?.averageRating?.toFixed(1) || "N/A"}</p>
                         <Rating
                             name="film-rating"
-                            value={selectedFilm?.averageRating || 0} // Display average rating
+                            value={selectedFilm?.averageRating || 0}
                             precision={0.5}
-                            readOnly // Make average rating read-only
+                            readOnly
                             sx={{
-                                '& .MuiRating-iconEmpty': { color: 'white' },
-                                '& .MuiRating-iconFilled': { color: '#facc15' },
-                                '& .MuiRating-iconHover': { color: '#fde047' },
+                                "& .MuiRating-iconEmpty": { color: "white" },
+                                "& .MuiRating-iconFilled": { color: "#facc15" },
+                                "& .MuiRating-iconHover": { color: "#fde047" },
                             }}
                         />
                     </div>
                 </div>
 
-                {selectedFilm?.ratingCount !== undefined && (
-                    <p className="text-sm text-gray-400 mt-1">
-                        Rated by <span className="text-yellow-300">{selectedFilm?.ratingCount}</span> people
-                    </p>
-                )}
-
-                {/* User Rating */}
                 <div className="mb-4">
                     <h4 className="text-sm text-gray-400 mt-2">Rate this movie:</h4>
                     <Rating
                         name="film-rating-user"
                         value={rating}
                         precision={0.5}
-                        onChange={(_e, newValue) => {
-                            setRating(newValue);
-                            handleRatingChange(newValue, selectedFilm.title); // Pass the title for the API request
-                        }}
+                        onChange={(_e, newValue) => handleRatingChange(newValue, selectedFilm.title)}
                         sx={{
-                            '& .MuiRating-iconEmpty': { color: 'white' },
-                            '& .MuiRating-iconFilled': { color: '#facc15' },
-                            '& .MuiRating-iconHover': { color: '#fde047' },
+                            "& .MuiRating-iconEmpty": { color: "white" },
+                            "& .MuiRating-iconFilled": { color: "#facc15" },
+                            "& .MuiRating-iconHover": { color: "#fde047" },
                         }}
                     />
                 </div>
 
-                {/* Add to Watchlist */}
                 <div className="flex justify-between gap-4">
                     <button
                         onClick={() => handleAddToWatchlist()}
@@ -225,8 +205,6 @@ const FilmDetail: React.FC = () => {
                     >
                         Add to Watchlist
                     </button>
-
-                    {/* Watch Now Button */}
                     <a
                         href={selectedFilm.link}
                         target="_blank"
@@ -236,8 +214,22 @@ const FilmDetail: React.FC = () => {
                         Watch Now
                     </a>
                 </div>
-
             </div>
+
+            {/* Snackbar */}
+            <Snackbar
+                open={snackbarOpen}
+                autoHideDuration={6000}
+                onClose={handleSnackbarClose}
+                anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+            >
+                <SnackbarContent
+                    sx={{
+                        backgroundColor: snackbarSeverity === "success" ? "green" : "red",
+                    }}
+                    message={snackbarMessage}
+                />
+            </Snackbar>
         </div>
     );
 };
