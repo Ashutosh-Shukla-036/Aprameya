@@ -13,6 +13,8 @@ import {
     Typography,
     IconButton,
     CircularProgress,
+    Snackbar,
+    SnackbarContent,
 } from "@mui/material";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 
@@ -23,10 +25,11 @@ const DetailedReview: React.FC = () => {
     const [review, setReview] = useState("");
     const [loading, setLoading] = useState(false);
     const [alertMessage, setAlertMessage] = useState<string | null>(null);
-    const [alertSeverity, setAlertSeverity] =
-        useState<"success" | "warning" | "error" | "info">("info");
+    const [alertSeverity, setAlertSeverity] = useState<"success" | "warning" | "error" | "info">("info");
     const [selectedFilm, setSelectedFilm] = useState<string>("");
 
+    // Snackbar state
+    const [snackbarOpen, setSnackbarOpen] = useState(false);
     const isLoggedIn = Boolean(user);
 
     // Updated film titles
@@ -65,12 +68,14 @@ const DetailedReview: React.FC = () => {
         if (!user?.userId || !user?.username) {
             setAlertMessage("You must be logged in to add a review.");
             setAlertSeverity("warning");
+            setSnackbarOpen(true);
             return;
         }
 
         if (!FilmTitle || !review) {
             setAlertMessage("Please provide both a film title and a review.");
             setAlertSeverity("error");
+            setSnackbarOpen(true);
             return;
         }
 
@@ -81,8 +86,8 @@ const DetailedReview: React.FC = () => {
             const response = await axios.post(
                 "http://localhost:5002/api/review/addreview",
                 {
-                    userId: user.userId,
-                    username: user.username,
+                    userId: user?.userId,
+                    username: user?.username,
                     FilmTitle,
                     review,
                 },
@@ -94,14 +99,10 @@ const DetailedReview: React.FC = () => {
             );
 
             if (response.status === 201 || response.status === 200) {
-                // Reset form states after successful submission
                 setFilmTitle("");
                 setReview("");
-
-                // Fetch updated reviews from the server after successful submission
                 const result = await axios.get("http://localhost:5002/api/review/getreviews");
                 setReviews(result.data);
-
                 setAlertMessage("Review added successfully!");
                 setAlertSeverity("success");
             } else {
@@ -114,6 +115,7 @@ const DetailedReview: React.FC = () => {
             setAlertSeverity("error");
         } finally {
             setLoading(false);
+            setSnackbarOpen(true);
         }
     };
 
@@ -122,16 +124,17 @@ const DetailedReview: React.FC = () => {
         if (!user?.userId) {
             setAlertMessage("You must be logged in to like a review.");
             setAlertSeverity("warning");
+            setSnackbarOpen(true);
             return;
         }
 
         setLoading(true);
         try {
             const response = await axios.post(
-                "http://localhost:5002/api/review/like", // Endpoint to like/unlike review
+                "http://localhost:5002/api/review/like",
                 {
                     reviewId,
-                    userId: user.userId,
+                    userId: user?.userId,
                 },
                 {
                     headers: {
@@ -141,30 +144,39 @@ const DetailedReview: React.FC = () => {
             );
 
             if (response.status === 200) {
-                // Update the reviews state to reflect the new like status
                 const updatedReviews = reviews.map((rev) =>
-                    rev._id === reviewId
-                        ? { ...rev, likes: rev.likes.includes(user.userId) ? rev.likes.filter((id: string) => id !== user.userId) : [...rev.likes, user.userId] }
+                    rev?._id === reviewId
+                        ? {
+                              ...rev,
+                              likes: rev.likes.includes(user.userId)
+                                  ? rev.likes.filter((id: string) => id !== user.userId)
+                                  : [...rev.likes, user.userId],
+                          }
                         : rev
                 );
                 setReviews(updatedReviews);
-
-                setAlertMessage(response.data.message);
+                setAlertMessage(response?.data.message);
                 setAlertSeverity("success");
+                setSnackbarOpen(true);
             }
         } catch (error) {
             console.error("Error liking review:", error);
             setAlertMessage("An error occurred while liking the review.");
             setAlertSeverity("error");
+            setSnackbarOpen(true);
         } finally {
             setLoading(false);
         }
     };
 
+    // Snackbar close handler
+    const handleSnackbarClose = () => {
+        setSnackbarOpen(false);
+    };
+
     return (
         <div className="min-h-screen bg-gray-900 text-white p-6">
             <div className="max-w-4xl mx-auto">
-                {/* Alert Message */}
                 {alertMessage && (
                     <Alert severity={alertSeverity} style={{ marginBottom: "16px" }}>
                         <AlertTitle>{alertSeverity.charAt(0).toUpperCase() + alertSeverity.slice(1)}</AlertTitle>
@@ -172,34 +184,17 @@ const DetailedReview: React.FC = () => {
                     </Alert>
                 )}
 
-                {/* Sort Reviews Dropdown */}
-                <div className="mb-4">
-                    <label htmlFor="filmSelect" className="block text-white mb-2">Film Title</label>
-                    <select
-                        id="filmSelect"
-                        value={selectedFilm}
-                        onChange={(e) => setSelectedFilm(e.target.value)}
-                        className="w-full p-2 bg-gray-700 text-white border border-gray-600 rounded-md"
-                    >
-                        <option value="">All Films</option>
-                        {filmOptions.map((option) => (
-                            <option key={option} value={option}>
-                                {option}
-                            </option>
-                        ))}
-                    </select>
-                </div>
-
-                {/* Add New Review Form */}
                 {isLoggedIn ? (
                     <form onSubmit={handleAddReview}>
                         <div className="bg-gray-800 p-6 rounded-md mb-6">
                             <div className="mb-4">
-                                <label htmlFor="filmTitle" className="block text-white mb-2">Film Title</label>
+                                <label htmlFor="filmTitle" className="block text-white mb-2">
+                                    Film Title
+                                </label>
                                 <select
                                     id="filmTitle"
                                     value={FilmTitle}
-                                    onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setFilmTitle(e.target.value)}
+                                    onChange={(e) => setFilmTitle(e.target.value)}
                                     className="w-full p-2 bg-gray-700 text-white border border-gray-600 rounded-md"
                                     required
                                 >
@@ -212,20 +207,16 @@ const DetailedReview: React.FC = () => {
                                 </select>
                             </div>
                             <div className="mb-4">
-                                <label htmlFor="review" className="block text-white mb-2">Your Review</label>
+                                <label htmlFor="review" className="block text-white mb-2">
+                                    Your Review
+                                </label>
                                 <textarea
                                     id="review"
                                     value={review}
-                                    onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setReview(e.target.value)}
+                                    onChange={(e) => setReview(e.target.value)}
                                     className="w-full p-2 bg-gray-700 text-white border border-gray-600 rounded-md"
                                     rows={4}
                                     required
-                                    style={{ resize: 'none' }} // Disable manual resizing
-                                    onInput={(e) => {
-                                        const target = e.target as HTMLTextAreaElement;  // Type cast to HTMLTextAreaElement
-                                        target.style.height = 'auto';
-                                        target.style.height = `${target.scrollHeight}px`;  // Adjust the height based on content
-                                    }}
                                 />
                             </div>
                             <Button
@@ -233,7 +224,7 @@ const DetailedReview: React.FC = () => {
                                 variant="contained"
                                 color="success"
                                 fullWidth
-                                disabled={loading} // Disable while loading
+                                disabled={loading}
                             >
                                 {loading ? <CircularProgress size={24} color="inherit" /> : "Submit Review"}
                             </Button>
@@ -246,7 +237,26 @@ const DetailedReview: React.FC = () => {
                     </Alert>
                 )}
 
-                {/* Display Filtered Reviews */}
+                {/* Filter Dropdown */}
+                <div className="mb-4">
+                    <label htmlFor="filmFilter" className="block text-white mb-2">
+                        Filter by Film
+                    </label>
+                    <select
+                        id="filmFilter"
+                        value={selectedFilm}
+                        onChange={(e) => setSelectedFilm(e.target.value)}
+                        className="w-full p-2 bg-gray-700 text-white border border-gray-600 rounded-md"
+                    >
+                        <option value="">All Films</option>
+                        {filmOptions.map((film) => (
+                            <option key={film} value={film}>
+                                {film}
+                            </option>
+                        ))}
+                    </select>
+                </div>
+
                 <h2 className="text-2xl font-bold text-yellow-400 my-4">Reviews</h2>
                 {loading ? (
                     <div className="text-center mt-8">
@@ -254,60 +264,80 @@ const DetailedReview: React.FC = () => {
                     </div>
                 ) : filteredReviews.length > 0 ? (
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 max-w-full mx-auto">
-                        {filteredReviews.map((review, index) => (
-                            <Card
-                                key={index}
-                                sx={{
-                                    backgroundColor: "#333",
-                                    borderRadius: "8px",
-                                    boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.2)",
-                                    padding: '16px',
-                                    transition: 'transform 0.2s ease-in-out',
-                                    '&:hover': { transform: 'scale(1.05)' }
-                                }}
-                            >
+                        {filteredReviews.map((review) => (
+                            <Card key={review?._id} sx={{ backgroundColor: "#333", borderRadius: "8px" }}>
                                 <CardContent>
-                                    <Typography variant="h6" className="font-bold text-yellow-400 mb-2">
-                                        {review.FilmTitle}
+                                    <Typography variant="h6" className="text-yellow-400">
+                                        {review?.FilmTitle}
                                     </Typography>
                                     <Typography
-                                        variant="body1"
-                                        sx={{
-                                            color: 'white',
-                                            fontStyle: 'italic',
-                                            marginBottom: 2,
-                                        }}
-                                    >
-                                        "{review.review}"
-                                    </Typography>
-                                    <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 1 }}>
-                                        <Typography variant="body2" sx={{ color: "gray", fontStyle: "italic", fontSize: '0.9rem' }}>
-                                            {review.username}
+                                    variant="body1"
+                                    sx={{
+                                        color: "white",
+                                        fontStyle: "italic",
+                                        maxHeight: "100px",
+                                        overflow: "hidden",
+                                        padding: "8px",
+                                        fontSize: "0.9rem",
+                                        wordBreak: "break-word",
+                                        display: "-webkit-box",
+                                        WebkitLineClamp: 3,
+                                        WebkitBoxOrient: "vertical",
+                                        overflowY: "auto",
+                                        scrollbarWidth: "none",
+                                        msOverflowStyle: "none",
+                                        "&::-webkit-scrollbar": {
+                                            display: "none",
+                                        },
+                                    }}
+                                >
+                                    "{review?.review}"
+                                </Typography>
+                                <Typography 
+                                    sx={{
+                                        color: 'gray',
+                                        fontSize: 12,
+                                        fontStyle: 'italic',
+                                    }}>{review?.username}
+                                </Typography>
+                                    <Box className="flex items-center justify-between">
+                                        <Typography variant="caption" className="text-gray-400">
+                                            {review?.likes.length} Likes
                                         </Typography>
-                                        <Box sx={{ display: "flex", alignItems: "center" }}>
-                                            <IconButton
+                                        <IconButton
+                                            onClick={() => handleLikeReview(review?._id)}
+                                            color="secondary"
+                                        >
+                                            <FavoriteIcon
                                                 sx={{
-                                                    color: review.likes.includes(user?.userId) ? "red" : "gray", 
+                                                    color: review?.likes.includes(user?.userId) ? "red" : "gray",
                                                 }}
-                                                onClick={() => handleLikeReview(review?._id)} 
-                                            >
-                                                <FavoriteIcon />
-                                            </IconButton>
-                                            <Typography variant="body2" sx={{ color: "gray", fontSize: '0.9rem', marginLeft: 1 }}>
-                                                {review.likes.length} Likes
-                                            </Typography>
-                                        </Box>
+                                            />
+                                        </IconButton>
                                     </Box>
                                 </CardContent>
                             </Card>
                         ))}
                     </div>
                 ) : (
-                    <Alert severity="info" style={{ marginBottom: "16px" }}>
-                        No reviews found for this film.
-                    </Alert>
+                    <div className="text-center text-gray-500">No reviews available.</div>
                 )}
             </div>
+
+            {/* Snackbar */}
+            <Snackbar
+                open={snackbarOpen}
+                autoHideDuration={6000}
+                onClose={handleSnackbarClose}
+                anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+            >
+                <SnackbarContent
+                    sx={{
+                        backgroundColor: alertSeverity === "success" ? "green" : "red",
+                    }}
+                    message={alertMessage}
+                />
+            </Snackbar>
         </div>
     );
 };
