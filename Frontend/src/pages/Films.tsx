@@ -1,16 +1,17 @@
 import { useRecoilValue } from "recoil";
 import { FilmAtom } from "../Atoms/FilmAtom";
-import FirstMovie from '../assets/FirstMovie.jpg';
-import SecondMovie from '../assets/SecondMovie.jpg';
-import ThirdMovie from '../assets/ThirdMovie.jpg';
-import FourthMovie from '../assets/FourthMovie.jpg';
-import { Rating } from '@mui/material'; // Import Rating from MUI
-import { useState, useEffect } from "react";
+import FirstMovie from "../assets/FirstMovie.jpg";
+import SecondMovie from "../assets/SecondMovie.jpg";
+import ThirdMovie from "../assets/ThirdMovie.jpg";
+import FourthMovie from "../assets/FourthMovie.jpg";
+import { Rating, Snackbar, Alert } from "@mui/material"; // MUI components
+import { useState } from "react";
 import { UserAtom } from "../Atoms/UserAtom";
-import { useNavigate } from "react-router-dom"; // Import useNavigate
+import { useNavigate } from "react-router-dom"; // React Router
+import axios from "axios";
 
 interface Film {
-    _id: string; // Assuming the film has an _id for backend interaction
+    _id: string;
     title: string;
     description: string;
     genre: string;
@@ -18,7 +19,7 @@ interface Film {
     releaseDate: string;
     link: string;
     cast: string[];
-    averageRating?: number; // Optional, if fetched from the backend or already in FilmAtom
+    averageRating?: number;
     ratingCount?: number;
     crew?: {
         dop?: string;
@@ -35,19 +36,15 @@ interface Film {
 }
 
 export const Film: React.FC = () => {
-    const films = useRecoilValue(FilmAtom); // Already contains average rating
-    const user = useRecoilValue(UserAtom); // To check if the user is logged in
-    const navigate = useNavigate(); // Hook to navigate
+    const films = useRecoilValue(FilmAtom); // List of films
+    const user = useRecoilValue(UserAtom); // Logged-in user info
+    const navigate = useNavigate(); // Navigation hook
     const [selectedGenre, setSelectedGenre] = useState<string>("All");
-    const [watchlist, setWatchlist] = useState<Film[]>(() => {
-        const savedWatchlist = localStorage.getItem('watchlist');
-        return savedWatchlist ? JSON.parse(savedWatchlist) : [];
-    });
 
-    useEffect(() => {
-        // Persist watchlist to localStorage whenever it changes
-        localStorage.setItem('watchlist', JSON.stringify(watchlist));
-    }, [watchlist]);
+    // States for Snackbar and Alert
+    const [alertMessage, setAlertMessage] = useState<string | null>(null);
+    const [alertSeverity, setAlertSeverity] = useState<"success" | "error" | undefined>(undefined);
+    const [snackbarOpen, setSnackbarOpen] = useState(false);
 
     const thumbnailMap: { [title: string]: string } = {
         "Safe Space": FirstMovie,
@@ -68,14 +65,37 @@ export const Film: React.FC = () => {
         ? films 
         : films.filter(film => film.genre === selectedGenre);
 
-    const handleAddToWatchlist = (film: Film) => {
+    const handleAddToWatchlist = async (film: Film) => {
         if (!user) {
-            navigate('/signup'); // Redirect to login page if not logged in
+            navigate("/signup"); // Redirect to signup/login if not logged in
             return;
         }
 
-        if (!watchlist.some(f => f.title === film.title)) {
-            setWatchlist(prev => [...prev, film]);
+        try {
+            await axios.post("http://localhost:5002/api/watchlist/addwatchlist", {
+                user: user?.userId,
+                film: film?._id,
+                link: film?.link,
+                title: film?.title,
+                description: film?.description,
+            });
+
+            // Success alert
+            setAlertMessage("Film added to your watchlist successfully!");
+            setAlertSeverity("success");
+            setSnackbarOpen(true);
+        } catch (error: any) {
+            console.error("Error adding to watchlist:", error);
+
+            // Error handling
+            const errorMessage =
+                error.response?.status === 409
+                    ? "This film is already in your watchlist."
+                    : "An error occurred. Please try again.";
+
+            setAlertMessage(errorMessage);
+            setAlertSeverity("error");
+            setSnackbarOpen(true);
         }
     };
 
@@ -99,7 +119,7 @@ export const Film: React.FC = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
                 {filteredFilms.map((film: Film, index: number) => (
                     <div key={index} className="bg-gray-800 p-6 rounded-lg shadow-lg">
-                        {/* Thumbnail with Hover Effect */}
+                        {/* Thumbnail */}
                         <img
                             src={getThumbnailPath(film.title)}
                             alt={film.title}
@@ -117,62 +137,25 @@ export const Film: React.FC = () => {
                         {/* Description */}
                         <p className="text-gray-300 text-base mb-4">{film.description}</p>
 
-                        {/* Cast */}
-                        <div className="mb-4">
-                            <h3 className="text-lg font-bold text-teal-300 mb-2">Cast:</h3>
-                            <ul className="list-disc list-inside text-gray-300">
-                                {film.cast.map((actor, i) => (
-                                    <li key={i}>{actor}</li>
-                                ))}
-                            </ul>
-                        </div>
-
-                        {/* Crew */}
-                        {film.crew && (
-                            <div className="mb-4">
-                                <h3 className="text-lg font-bold text-teal-300 mb-2">Crew:</h3>
-                                <ul className="list-none text-gray-300">
-                                    {Object.entries(film.crew).map(([role, person], i) =>
-                                        person ? (
-                                            <li key={i}>
-                                                <span className="font-semibold text-yellow-300">{role}: </span>
-                                                {Array.isArray(person) ? (
-                                                    <ul className="ml-4 list-disc">
-                                                        {person.map((individual, index) => (
-                                                            <li key={index}>{individual}</li>
-                                                        ))}
-                                                    </ul>
-                                                ) : (
-                                                    person
-                                                )}
-                                            </li>
-                                        ) : null
-                                    )}
-                                </ul>
-                            </div>
-                        )}
-
                         {/* Average Rating */}
                         <div className="mb-4">
                             <h3 className="text-lg font-bold text-teal-300 mb-2">Average Rating:</h3>
                             <div className="flex items-center">
-                                {/* Show the average rating */}
                                 <p className="mr-2 text-lg text-yellow-300">
-                                    {film.averageRating ? film.averageRating.toFixed(1) : 'N/A'}
+                                    {film.averageRating ? film.averageRating.toFixed(1) : "N/A"}
                                 </p>
                                 <Rating
                                     name="film-rating"
-                                    value={film.averageRating || 0} // Display average rating
+                                    value={film.averageRating || 0}
                                     precision={0.5}
-                                    readOnly // Make average rating read-only
+                                    readOnly
                                     sx={{
-                                        '& .MuiRating-iconEmpty': { color: 'white' },
-                                        '& .MuiRating-iconFilled': { color: '#facc15' },
-                                        '& .MuiRating-iconHover': { color: '#fde047' },
+                                        "& .MuiRating-iconEmpty": { color: "white" },
+                                        "& .MuiRating-iconFilled": { color: "#facc15" },
+                                        "& .MuiRating-iconHover": { color: "#fde047" },
                                     }}
                                 />
                             </div>
-                            {/* Show the number of ratings */}
                             {film.ratingCount !== undefined && (
                                 <p className="text-sm text-gray-400 mt-1">
                                     Rated by <span className="text-yellow-300">{film.ratingCount}</span> people
@@ -182,22 +165,35 @@ export const Film: React.FC = () => {
 
                         {/* Watch Now and Add to Watchlist Buttons */}
                         <div className="flex justify-between items-center">
-                            {/* Watch Now Button */}
                             <a href={film.link} className="bg-teal-500 text-white py-2 px-4 rounded-md hover:bg-yellow-500">
                                 Watch Now
                             </a>
-
-                            {/* Add to Watchlist Button */}
-                            <button 
+                            <button
                                 className="bg-yellow-500 text-white py-2 px-4 rounded-md hover:bg-teal-400"
                                 onClick={() => handleAddToWatchlist(film)}
                             >
-                                {watchlist.some(f => f.title === film.title) ? 'Added to Watchlist' : 'Add to Watchlist'}
+                                Add to Watchlist
                             </button>
                         </div>
                     </div>
                 ))}
             </div>
+
+            {/* Snackbar for Alerts */}
+            <Snackbar
+                open={snackbarOpen}
+                autoHideDuration={4000}
+                onClose={() => setSnackbarOpen(false)}
+                anchorOrigin={{ vertical: "top", horizontal: "center" }}
+            >
+                <Alert 
+                    onClose={() => setSnackbarOpen(false)} 
+                    severity={alertSeverity} 
+                    sx={{ width: "100%" }}
+                >
+                    {alertMessage}
+                </Alert>
+            </Snackbar>
         </div>
     );
 };
