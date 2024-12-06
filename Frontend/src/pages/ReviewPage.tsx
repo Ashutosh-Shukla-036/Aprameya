@@ -1,26 +1,34 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useRecoilValue } from "recoil";
-import { UserAtom } from "../Atoms/UserAtom"; // Assuming you store user info in Recoil state.
+import { UserAtom } from "../Atoms/UserAtom";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import Typography from "@mui/material/Typography";
 import IconButton from "@mui/material/IconButton";
 import DeleteIcon from "@mui/icons-material/Delete";
 import Box from "@mui/material/Box";
-import CircularProgress from "@mui/material/CircularProgress"; // For loading spinner
+import CircularProgress from "@mui/material/CircularProgress";
+import Snackbar from "@mui/material/Snackbar";
+import Alert from "@mui/material/Alert";
 
 const ReviewPage: React.FC = () => {
     const [reviews, setReviews] = useState<any[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
-    const user = useRecoilValue(UserAtom); // Assuming user data is stored in Recoil
+    const [snackbar, setSnackbar] = useState<{ open: boolean; message: string; severity: "success" | "error" }>({
+        open: false,
+        message: "",
+        severity: "success",
+    });
+
+    const user = useRecoilValue(UserAtom);
     const navigate = useNavigate();
 
     // Fetch the reviews for the logged-in user
     useEffect(() => {
         const fetchUserReviews = async () => {
             if (!user) {
-                navigate("/login"); // Redirect to login if no user is logged in
+                navigate("/login");
                 return;
             }
 
@@ -29,13 +37,12 @@ const ReviewPage: React.FC = () => {
                 const data = await response.json();
                 if (Array.isArray(data)) {
                     setReviews(data);
-                } else {
-                    console.error("Failed to fetch reviews");
                 }
             } catch (error) {
                 console.error("Error fetching user reviews:", error);
+                setSnackbar({ open: true, message: "An error occurred while fetching reviews.", severity: "error" });
             } finally {
-                setLoading(false); // Stop the loader once data is fetched
+                setLoading(false);
             }
         };
 
@@ -51,12 +58,19 @@ const ReviewPage: React.FC = () => {
 
             if (response.ok) {
                 setReviews(reviews.filter((review) => review._id !== reviewId));
+                setSnackbar({ open: true, message: "Review deleted successfully!", severity: "success" });
             } else {
-                console.error("Failed to delete the review");
+                setSnackbar({ open: true, message: "Failed to delete the review.", severity: "error" });
             }
         } catch (error) {
             console.error("Error deleting review:", error);
+            setSnackbar({ open: true, message: "An error occurred while deleting the review.", severity: "error" });
         }
+    };
+
+    // Close Snackbar
+    const handleCloseSnackbar = () => {
+        setSnackbar((prev) => ({ ...prev, open: false }));
     };
 
     return (
@@ -71,7 +85,7 @@ const ReviewPage: React.FC = () => {
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
                     {reviews.map((review) => (
                         <Card
-                            key={review._id}
+                            key={review?._id}
                             sx={{
                                 backgroundColor: "#333",
                                 borderRadius: "8px",
@@ -81,10 +95,9 @@ const ReviewPage: React.FC = () => {
                         >
                             <CardContent>
                                 <Typography variant="h6" sx={{ color: "#ffca28", fontWeight: "bold", marginBottom: 1 }}>
-                                    {review.FilmTitle}
+                                    {review?.FilmTitle}
                                 </Typography>
 
-                                {/* Container for review content with fixed height and scroll */}
                                 <Typography
                                     variant="body1"
                                     sx={{
@@ -104,13 +117,11 @@ const ReviewPage: React.FC = () => {
                                         "&::-webkit-scrollbar": {
                                             display: "none",
                                         },
-                                        scrollBehavior: "smooth",
                                     }}
                                 >
-                                    "{review.review}"
+                                    "{review?.review}"
                                 </Typography>
 
-                                {/* Flex container for Delete Icon */}
                                 <Box sx={{ display: "flex", justifyContent: "flex-end", alignItems: "center" }}>
                                     <IconButton
                                         aria-label="delete review"
@@ -145,6 +156,18 @@ const ReviewPage: React.FC = () => {
                     </div>
                 </>
             )}
+
+            {/* Snackbar */}
+            <Snackbar
+                open={snackbar.open}
+                autoHideDuration={6000}
+                onClose={handleCloseSnackbar}
+                anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+            >
+                <Alert onClose={handleCloseSnackbar} severity={snackbar.severity} sx={{ width: "100%" }}>
+                    {snackbar.message}
+                </Alert>
+            </Snackbar>
         </div>
     );
 };
