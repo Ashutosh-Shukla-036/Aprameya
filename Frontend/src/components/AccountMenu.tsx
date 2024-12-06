@@ -10,7 +10,6 @@ import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import Logout from '@mui/icons-material/Logout';
 import StarIcon from '@mui/icons-material/Star';
 import MovieIcon from '@mui/icons-material/Movie';
-import SettingsIcon from '@mui/icons-material/Settings';
 import HomeIcon from '@mui/icons-material/Home';
 import { useSetRecoilState } from 'recoil';
 import { UserAtom } from '../Atoms/UserAtom';
@@ -124,7 +123,10 @@ export default function AccountMenu() {
           Your Reviews
         </MenuItem>
         <MenuItem
-          onClick={handleClose}
+          onClick = {() => {
+            handleClose(),
+            navigate("/watchlist");
+          }}
           sx={{
             '&:hover': {
               backgroundColor: '#404040',
@@ -136,20 +138,6 @@ export default function AccountMenu() {
             <MovieIcon sx={{ color: '#FFFFFF' }} />
           </ListItemIcon>
           Watchlist
-        </MenuItem>
-        <MenuItem
-          onClick={handleClose}
-          sx={{
-            '&:hover': {
-              backgroundColor: '#404040',
-              color: '#FFFFFF',
-            },
-          }}
-        >
-          <ListItemIcon>
-            <SettingsIcon sx={{ color: '#FFFFFF' }} />
-          </ListItemIcon>
-          Account Settings
         </MenuItem>
         <Divider sx={{ borderColor: '#707070', my: 1 }} />
         <MenuItem
