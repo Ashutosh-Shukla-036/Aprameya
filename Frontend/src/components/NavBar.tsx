@@ -19,7 +19,7 @@ const NavBar: React.FC = () => {
       <div className="container mx-auto px-6 py-4 flex justify-between items-center">
         <Link to="/" className="flex items-center space-x-3">
           <span className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-yellow-400 to-teal-400 transition duration-300 hover:from-teal-400 hover:to-yellow-400">
-            Aprameya Productions
+            Aprameya
           </span>
         </Link>
 
@@ -55,6 +55,11 @@ const NavBar: React.FC = () => {
           <li>
             <Link to="/films" className={navLinkStyle} onClick={() => setIsOpen(false)}>
               Films
+            </Link>
+          </li>
+          <li>
+            <Link to="/reviews" className={navLinkStyle} onClick={() => setIsOpen(false)}>
+              Reviews
             </Link>
           </li>
           <li>
