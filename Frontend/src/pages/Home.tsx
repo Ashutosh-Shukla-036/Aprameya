@@ -45,6 +45,7 @@ const Home: React.FC = () => {
             try {
                 const result = await fetch("http://localhost:5002/api/review/getreviews");
                 const reviews = await result.json();
+                console.log(reviews)
                 setReviews(reviews);
             } catch (error) {
                 console.error("Error fetching reviews:", error);
@@ -200,7 +201,7 @@ const Home: React.FC = () => {
                     </div>
                 ) : (
                     <div className="text-center mt-8">
-                        <p className="text-xl text-gray-300">No reviews available yet.</p>
+                        <p className="text-xl text-gray-300 mb-5">No reviews available yet.</p>
                         <Link
                             to="/reviews"
                             className="px-6 py-3 bg-teal-500 text-white font-semibold rounded-full shadow-lg hover:bg-yellow-400 hover:text-gray-900 transition duration-300 text-center"
