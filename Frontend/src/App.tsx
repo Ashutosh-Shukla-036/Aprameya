@@ -10,11 +10,15 @@ import FilmDetail from "./components/FilmDetail";
 import DetailedReview from "./components/DetailedReview";
 import ReviewPage from "./pages/ReviewPage";
 import CrowdFundingPage from "./pages/CrowdFunding";
+import ScrollToTop from "./components/ScrollToTop";
+import WatchList from "./pages/WatchList";
+import NotFound from "./pages/NotFound";
 
 function App() {
   return (
     <div className="bg-custom-gradient text-white">
       <NavBar />
+      <ScrollToTop />
       <Routes>
         <Route path="/" element={<Home />}></Route>
         <Route path="/films" element={<Film />}></Route>
@@ -24,7 +28,9 @@ function App() {
         <Route path="/film/:title" element={<FilmDetail />}></Route>
         <Route path="/reviews" element={<DetailedReview/>}></Route>
         <Route path="/review" element={<ReviewPage/>}></Route>
+        <Route path="/watchlist" element={<WatchList/>}></Route>
         <Route path="/funding" element={<CrowdFundingPage />}></Route>
+        <Route path="*" element={<NotFound />}></Route>
 
       </Routes>
       <Footer />
