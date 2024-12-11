@@ -188,6 +188,30 @@ const FilmDetail: React.FC = () => {
           </ul>
         </div>
 
+        {selectedFilm.crew && (
+          <div className="mb-4">
+            <h3 className="text-lg font-bold text-teal-300 mb-2">Crew:</h3>
+              <ul className="list-none text-gray-300">
+                {Object.entries(selectedFilm?.crew).map(([role, person], i) =>
+                  person ? (
+                    <li key={i}>
+                      <span className="font-semibold text-yellow-300">{role}: </span>
+                      {Array.isArray(person) ? (
+                        <ul className="ml-4 list-disc">
+                          {person.map((individual, index) => (
+                            <li key={index}>{individual}</li>
+                          ))}
+                        </ul>
+                      ) : (
+                        person
+                      )}
+                    </li>
+                  ) : null
+                )}
+              </ul>
+          </div>
+        )}
+
         <div className="mb-4">
           <h3 className="text-lg font-bold text-teal-300 mb-2">Average Rating:</h3>
           <div className="flex items-center">
