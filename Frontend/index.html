@@ -22,6 +22,12 @@
     <meta property="og:locale" content="en_US" />
     <meta property="og:site_name" content="Aprameya Productions" />
 
+    <!-- Twitter Card Metadata -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Aprameya Productions - Short Films Platform">
+    <meta name="twitter:description" content="Discover and manage short films with ease on Aprameya Productions' platform. Perfect for filmmakers and film enthusiasts alike.">
+    <meta name="twitter:image" content="https://aprameyaproductions.vercel.app/android-chrome-512x512.png">
+    <meta name="twitter:site" content="@AprameyaProd">
 
     <!-- Additional Metadata -->
     <meta name="application-name" content="Aprameya Productions">
@@ -48,10 +54,22 @@
     <link rel="manifest" href="/site.webmanifest">
     <link rel="icon" type="image/png" sizes="192x192" href="/android-chrome-192x192.png">
     <link rel="icon" type="image/png" sizes="512x512" href="/android-chrome-512x512.png">
-    
+
+    <!-- Structured Data for Logo -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "Aprameya Productions",
+      "url": "https://aprameyaproductions.vercel.app",
+      "logo": "https://aprameyaproductions.vercel.app/android-chrome-512x512.png",
+      "description": "A platform dedicated to showcasing and managing short films with simplicity and usability in mind.",
+    }
+    </script>
+
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root" role="main"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
