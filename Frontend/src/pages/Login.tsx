@@ -23,7 +23,7 @@ const Login: React.FC = () => {
         setError(false);
         setSuccessMessage("");
         try {
-            const response = await axios.post("http://localhost:5002/api/user/login", {
+            const response = await axios.post("https://aprameya.onrender.com/api/user/login", {
                 email,
                 password,
             });

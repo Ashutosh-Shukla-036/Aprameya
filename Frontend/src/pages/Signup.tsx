@@ -20,7 +20,7 @@ const SignUp: React.FC = () => {
         setError(null);
 
         try {
-            const response = await axios.post("http://localhost:5002/api/user/signup", {
+            const response = await axios.post("https://aprameya.onrender.com/api/user/signup", {
                 username,
                 email,
                 password,

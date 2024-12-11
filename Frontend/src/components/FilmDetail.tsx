@@ -18,7 +18,7 @@ const FilmDetail: React.FC = () => {
     const [films, setFilms] = useRecoilState(FilmAtom);
     const navigate = useNavigate();
     const [rating, setRating] = useState<number | null>(null);
-    const [isRatingUpdated, setIsRatingUpdated] = useState<boolean>(false);
+    const [, setIsRatingUpdated] = useState<boolean>(false);
 
     // Snackbar state
     const [snackbarOpen, setSnackbarOpen] = useState<boolean>(false);
@@ -63,7 +63,7 @@ const FilmDetail: React.FC = () => {
 
         try {
             // Send the rating to the backend using axios
-            await axios.post("http://localhost:5002/api/rating/addrating", {
+            await axios.post("https://aprameya.onrender.com/api/rating/addrating", {
                 filmId: selectedFilm?._id,
                 rating: newRating,
                 userId: user?.userId,
@@ -90,7 +90,7 @@ const FilmDetail: React.FC = () => {
         if (user) {
             const fetchRating = async () => {
                 try {
-                    const response = await axios.get(`http://localhost:5002/api/rating/getrating/${user.userId}/${selectedFilm?._id}`);
+                    const response = await axios.get(`https://aprameya.onrender.com/api/rating/getrating/${user.userId}/${selectedFilm?._id}`);
                     setRating(response.data.rating); // Set user's rating
                 } catch (error) {
                     console.error("Error fetching user's rating:", error);
@@ -100,7 +100,7 @@ const FilmDetail: React.FC = () => {
         }
         const fetchFilms = async () => {
             try {
-                const result = await fetch("http://localhost:5002/api/films/getfilms");
+                const result = await fetch("https://aprameya.onrender.com/api/films/getfilms");
                 const films = await result.json();
                 setFilms(films);
             } catch (error) {

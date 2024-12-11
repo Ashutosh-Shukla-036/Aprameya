@@ -45,7 +45,7 @@ const DetailedReview: React.FC = () => {
         const fetchReviews = async () => {
             try {
                 setLoading(true);
-                const result = await axios.get("http://localhost:5002/api/review/getreviews");
+                const result = await axios.get("https://aprameya.onrender.com/api/review/getreviews");
                 setReviews(result.data);
             } catch (error) {
                 console.error("Error fetching reviews:", error);
@@ -84,7 +84,7 @@ const DetailedReview: React.FC = () => {
 
         try {
             const response = await axios.post(
-                "http://localhost:5002/api/review/addreview",
+                "https://aprameya.onrender.com/api/review/addreview",
                 {
                     userId: user?.userId,
                     username: user?.username,
@@ -101,7 +101,7 @@ const DetailedReview: React.FC = () => {
             if (response.status === 201 || response.status === 200) {
                 setFilmTitle("");
                 setReview("");
-                const result = await axios.get("http://localhost:5002/api/review/getreviews");
+                const result = await axios.get("https://aprameya.onrender.com/api/review/getreviews");
                 setReviews(result.data);
                 setAlertMessage("Review added successfully!");
                 setAlertSeverity("success");
@@ -131,7 +131,7 @@ const DetailedReview: React.FC = () => {
         setLoading(true);
         try {
             const response = await axios.post(
-                "http://localhost:5002/api/review/like",
+                "https://aprameya.onrender.com/api/review/like",
                 {
                     reviewId,
                     userId: user?.userId,

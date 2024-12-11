@@ -33,7 +33,7 @@ const ReviewPage: React.FC = () => {
             }
 
             try {
-                const response = await fetch(`http://localhost:5002/api/review/getuserreview/${user.userId}`);
+                const response = await fetch(`https://aprameya.onrender.com/api/review/getuserreview/${user.userId}`);
                 const data = await response.json();
                 if (Array.isArray(data)) {
                     setReviews(data);
@@ -52,7 +52,7 @@ const ReviewPage: React.FC = () => {
     // Handle deleting a review
     const handleDeleteReview = async (reviewId: string) => {
         try {
-            const response = await fetch(`http://localhost:5002/api/review/deletereview/${reviewId}`, {
+            const response = await fetch(`https://aprameya.onrender.com/api/review/deletereview/${reviewId}`, {
                 method: "DELETE",
             });
 

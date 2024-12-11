@@ -33,7 +33,7 @@ const Home: React.FC = () => {
     useEffect(() => {
         const fetchFilms = async () => {
             try {
-                const result = await fetch("http://localhost:5002/api/films/getfilms");
+                const result = await fetch("https://aprameya.onrender.com/api/films/getfilms");
                 const films = await result.json();
                 setFilms(films);
             } catch (error) {
@@ -43,7 +43,7 @@ const Home: React.FC = () => {
 
         const fetchReviews = async () => {
             try {
-                const result = await fetch("http://localhost:5002/api/review/getreviews");
+                const result = await fetch("https://aprameya.onrender.com/api/review/getreviews");
                 const reviews = await result.json();
                 console.log(reviews)
                 setReviews(reviews);

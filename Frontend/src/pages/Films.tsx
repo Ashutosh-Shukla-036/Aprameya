@@ -72,7 +72,7 @@ export const Film: React.FC = () => {
         }
 
         try {
-            await axios.post("http://localhost:5002/api/watchlist/addwatchlist", {
+            await axios.post("https://aprameya.onrender.com/api/watchlist/addwatchlist", {
                 user: user?.userId,
                 film: film?._id,
                 link: film?.link,

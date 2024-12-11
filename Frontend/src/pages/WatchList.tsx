@@ -24,7 +24,7 @@ const WatchList: React.FC = () => {
 
     const fetchWatchList = async () => {
       try {
-        const response = await axios.get(`http://localhost:5002/api/watchlist/getwatchlist/${user?.userId}`);
+        const response = await axios.get(`https://aprameya.onrender.com/api/watchlist/getwatchlist/${user?.userId}`);
         setWatchList(response?.data?.watchlist);
       } catch (error) {
         console.error("Error fetching watchlist:", error);
@@ -41,7 +41,7 @@ const WatchList: React.FC = () => {
 
   const handleDelete = async (id: string) => {
     try {
-      await axios.delete(`http://localhost:5002/api/watchlist/deletewatchlist/${id}`);
+      await axios.delete(`https://aprameya.onrender.com/api/watchlist/deletewatchlist/${id}`);
       setWatchList((prev) => prev.filter((item) => item._id !== id));
       setSnackbarMessage("Watchlist item deleted successfully.");
       setSnackbarSeverity("success");
