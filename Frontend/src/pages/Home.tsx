@@ -19,7 +19,7 @@ import { useInView } from 'react-intersection-observer';
 const Home: React.FC = () => {
     const [films, setFilms] = useRecoilState(FilmAtom);
     const [reviews, setReviews] = useRecoilState(ReviewAtom);
-    const [hoveredFilm, setHoveredFilm] = React.useState<string | null>(null);
+    const [isSectionInView, setIsSectionInView] = React.useState(false); // Track visibility of the section
     const navigate = useNavigate();
     const filmRef = useRef<HTMLDivElement>(null);
 
@@ -34,9 +34,13 @@ const Home: React.FC = () => {
         return thumbnailMap[title] || APlogo;
     };
 
+    // IntersectionObserver to track when films section comes into view
     const [filmsRef, filmsInView] = useInView({
         triggerOnce: true,
         threshold: 0.1,
+        onChange: (inView) => {
+            setIsSectionInView(inView); // Update when the section comes into view
+        },
     });
 
     useEffect(() => {
@@ -127,10 +131,8 @@ const Home: React.FC = () => {
                                 initial={{ opacity: 0, y: 50 }}
                                 animate={filmsInView ? { opacity: 1, y: 0 } : {}}
                                 transition={{ delay: index * 0.2 }}
-                                whileHover={{ y: -10 }}
+                                whileHover={isSectionInView ? { y: -10, scale: 1.05 } : {}}
                                 className="relative group"
-                                onHoverStart={() => setHoveredFilm(film.title)}
-                                onHoverEnd={() => setHoveredFilm(null)}
                             >
                                 <div className="relative overflow-hidden rounded-lg shadow-xl bg-gray-800">
                                     <motion.img
@@ -142,7 +144,7 @@ const Home: React.FC = () => {
                                     />
                                     <motion.div 
                                         initial={{ opacity: 0 }}
-                                        animate={{ opacity: hoveredFilm === film.title ? 1 : 0 }}
+                                        animate={{ opacity: isSectionInView ? 1 : 0 }}  // Apply hover effect when the section is in view
                                         className="absolute inset-0 bg-black bg-opacity-60 flex items-center justify-center"
                                     >
                                         <div className="text-center p-4">
