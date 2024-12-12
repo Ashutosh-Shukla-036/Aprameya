@@ -65,6 +65,10 @@ export const Film: React.FC = () => {
         ? films 
         : films.filter(film => film.genre === selectedGenre);
 
+    const handleSeeInDetail = (title: string) => {
+        navigate(`/film/${title}`);
+    };
+
     const handleAddToWatchlist = async (film: Film) => {
         if (!user) {
             navigate("/signup"); // Redirect to signup/login if not logged in
@@ -162,19 +166,36 @@ export const Film: React.FC = () => {
                                 </p>
                             )}
                         </div>
+                        
+                        <div className="text-gray-300 text-sm my-2 md:my-4">
+                            <span>Click on "See in Detail" to rate the film.</span>
+                        </div>
+
 
                         {/* Watch Now and Add to Watchlist Buttons */}
-                        <div className="flex justify-between items-center">
-                            <a href={film.link} className="bg-teal-500 text-white py-2 px-4 rounded-md hover:bg-yellow-500">
+                        <div className="flex flex-col md:flex-row items-center gap-2 sm:gap-4">
+                            <a
+                                href={film.link}
+                                className="bg-teal-500 text-black py-2 px-4 mt-4 rounded-md hover:bg-yellow-500 text-xs sm:text-sm md:text-base sm:py-1 sm:px-3"
+                            >
                                 Watch Now
                             </a>
+
                             <button
-                                className="bg-yellow-500 text-white py-2 px-4 rounded-md hover:bg-teal-400"
+                                onClick={() => handleSeeInDetail(film.title)}
+                                className="bg-gradient-to-r from-teal-500 to-yellow-400 text-black py-2 px-4 mt-4 rounded-lg transition duration-300 hover:from-yellow-400 hover:to-teal-500 text-xs sm:text-sm md:text-base sm:py-1 sm:px-3"
+                            >
+                                See in Detail
+                            </button>
+
+                            <button
+                                className="bg-yellow-500 text-black py-2 px-4 mt-4 rounded-md hover:bg-teal-400 text-xs sm:text-sm md:text-base sm:py-1 sm:px-3"
                                 onClick={() => handleAddToWatchlist(film)}
                             >
                                 Add to Watchlist
                             </button>
                         </div>
+
                     </div>
                 ))}
             </div>
