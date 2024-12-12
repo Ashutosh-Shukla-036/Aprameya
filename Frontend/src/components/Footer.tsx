@@ -43,7 +43,7 @@ export const Footer: React.FC = () => {
 
         {/* Collaboration Section */}
         <div className="text-center mb-6 md:mb-0">
-          <h2 className="text-xl font-semibold mb-2">Collaborate With Me</h2>
+          <h2 className="text-xl font-semibold mb-2">Collaborate With Us</h2>
           <p className="mb-2">I’m open to collaboration on exciting projects. If you have an idea or would like to work together, feel free to reach out!</p>
           <a
             href="mailto:locusproductions2023@gmail.com"
