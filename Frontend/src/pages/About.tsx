@@ -11,6 +11,19 @@ const About: React.FC = () => {
                     <p className="text-lg md:text-xl text-gray-300 text-center max-w-3xl mx-auto">
                         Welcome to Aprameya Productions, where stories find their soul and creativity takes center stage. Driven by a passion for storytelling and a commitment to excellence, we craft visually stunning and emotionally resonant content that connects with audiences on a deeper level.
                     </p>
+
+                    {/* Embedded Video */}
+                    <div className="w-full max-w-4xl aspect-video bg-gray-800 rounded-md overflow-hidden shadow-lg">
+                        <iframe
+                            className="w-full h-full"
+                            src="https://www.youtube-nocookie.com/embed/Cx0_kWextOk?rel=0&si=fkjxJn6y0IaKGTnV"
+                            title="YouTube video player"
+                            frameBorder="0"
+                            allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+                            allowFullScreen
+                            loading="lazy"
+                        ></iframe>
+                    </div>
                 </div>
 
                 <div className="space-y-12 mt-12">
