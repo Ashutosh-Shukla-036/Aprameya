@@ -4,14 +4,18 @@ import { HiOutlineUserCircle, HiOutlineMail, HiOutlineLockClosed } from "react-i
 import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
 import axios, { AxiosError } from "axios";
 import Alert from "@mui/material/Alert";
+import { useSetRecoilState } from "recoil";
+import { UserAtom } from "../Atoms/UserAtom";
 
 const SignUp: React.FC = () => {
     const navigate = useNavigate();
+    const setUser = useSetRecoilState(UserAtom);
     const [username, setUsername] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState<string | string[] | null>(null);
     const [showPassword, setShowPassword] = useState(false);
+    const [successMessage, setSuccessMessage] = useState("");
     const [isLoading, setIsLoading] = useState(false);
 
     const handleSignup = async (e: React.FormEvent) => {
@@ -26,9 +30,27 @@ const SignUp: React.FC = () => {
                 password,
             });
 
-            if (response.data.success) {
-                alert("Signup successful!");
-                navigate("/login");
+            console.log(response);
+
+            if (response.status === 201) {
+                setSuccessMessage("Registered successfully.");
+                setTimeout(() => {
+                    navigate("/");
+                }, 1000);
+                localStorage.setItem("token", response?.data?.token);
+                localStorage.setItem(
+                    "user",
+                    JSON.stringify({
+                        username: response?.data?.username,
+                        email: response?.data?.email,
+                        userId: response?.data?.userId,
+                    })
+                );
+                setUser({
+                    username: response?.data?.username,
+                    email: response?.data?.email,
+                    userId: response?.data?.userId,
+                });
             } else {
                 setError(response?.data?.message || "Signup failed.");
             }
@@ -59,6 +81,12 @@ const SignUp: React.FC = () => {
             <h2 className="text-4xl font-extrabold mb-6 text-center text-white">
                 Create Your Account
             </h2>
+
+            {successMessage && (
+                <Alert severity="success" className="mb-4">
+                    {successMessage}
+                </Alert>
+            )}
 
             {error && (
                 <Alert severity="error" role="alert" className="mb-4">
