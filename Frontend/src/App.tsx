@@ -13,6 +13,8 @@ import CrowdFundingPage from "./pages/CrowdFunding";
 import ScrollToTop from "./components/ScrollToTop";
 import WatchList from "./pages/WatchList";
 import NotFound from "./pages/NotFound";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import TermsOfService from "./pages/TermsOfService";
 
 function App() {
   return (
@@ -30,6 +32,8 @@ function App() {
         <Route path="/review" element={<ReviewPage/>}></Route>
         <Route path="/watchlist" element={<WatchList/>}></Route>
         <Route path="/funding" element={<CrowdFundingPage />}></Route>
+        <Route path="/privacypolicy" element={<PrivacyPolicy />}></Route>
+        <Route path="/termsofservice" element={<TermsOfService />}></Route>
         <Route path="*" element={<NotFound />}></Route>
 
       </Routes>

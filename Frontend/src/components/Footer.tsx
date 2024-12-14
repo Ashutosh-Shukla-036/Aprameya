@@ -9,7 +9,7 @@ export const Footer: React.FC = () => {
         {/* Logo Section */}
         <div className="flex flex-col items-center mb-6 md:mb-0">
             <span className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-yellow-400 to-teal-400 transition duration-300 hover:from-teal-400 hover:to-yellow-400">
-                Aprameya Production
+                Aprameya Productions
             </span>
 
           {/* Social Media Links */}
@@ -25,7 +25,7 @@ export const Footer: React.FC = () => {
 
         {/* Contact Information */}
         <div className="text-center mb-6 md:mb-0">
-          <h2 className="text-xl font-semibold mb-2">Contact Me</h2>
+          <h2 className="text-xl font-semibold mb-2">Contact Us</h2>
           <p className="mb-1">
             <span className="font-semibold">Phone:</span> +91 81054 81630
           </p>
@@ -56,11 +56,10 @@ export const Footer: React.FC = () => {
 
       {/* Footer Bottom Links */}
       <div className="mt-5 border-t border-gray-700 pt-4 text-center">
-        <p className="text-sm mb-2">© 2024 Aprameya Production. All rights reserved.</p>
+        <p className="text-sm mb-2">© 2024 Aprameya Productions. All rights reserved.</p>
         <div className="flex justify-center space-x-6">
-          <Link to="/" className="text-yellow-400 hover:text-teal-300 transition duration-200">Home</Link>
-          <Link to="/films" className="text-yellow-400 hover:text-teal-300 transition duration-200">Films</Link>
-          <Link to="/about" className="text-yellow-400 hover:text-teal-300 transition duration-200">About Us</Link>
+          <Link to="/privacypolicy" className="text-yellow-400 hover:text-teal-300 transition duration-200">Privacy Policy</Link>
+          <Link to="/termsofservice" className="text-yellow-400 hover:text-teal-300 transition duration-200">Terms Of Service</Link>
         </div>
       </div>
     </footer>
