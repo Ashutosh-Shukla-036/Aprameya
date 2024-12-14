@@ -21,6 +21,12 @@ export const Footer: React.FC = () => {
               <FaYoutube className="text-2xl text-black hover:text-blue-500 transition dark:text-white dark:hover:text-blue-500" />
             </a>
           </div>
+
+          <div className="flex justify-center space-x-6 mt-4">
+            <Link to="/privacypolicy" className="text-yellow-400 hover:text-teal-300 transition duration-200">Privacy Policy</Link>
+            <Link to="/termsofservice" className="text-yellow-400 hover:text-teal-300 transition duration-200">Terms Of Service</Link>
+          </div>
+
         </div>
 
         {/* Contact Information */}
@@ -57,10 +63,6 @@ export const Footer: React.FC = () => {
       {/* Footer Bottom Links */}
       <div className="mt-5 border-t border-gray-700 pt-4 text-center">
         <p className="text-sm mb-2">© 2024 Aprameya Productions. All rights reserved.</p>
-        <div className="flex justify-center space-x-6">
-          <Link to="/privacypolicy" className="text-yellow-400 hover:text-teal-300 transition duration-200">Privacy Policy</Link>
-          <Link to="/termsofservice" className="text-yellow-400 hover:text-teal-300 transition duration-200">Terms Of Service</Link>
-        </div>
       </div>
     </footer>
   );
