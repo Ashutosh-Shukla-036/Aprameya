@@ -4,6 +4,8 @@ import FirstMovie from "../assets/FirstMovie.jpg";
 import SecondMovie from "../assets/SecondMovie.jpg";
 import ThirdMovie from "../assets/ThirdMovie.jpg";
 import FourthMovie from "../assets/FourthMovie.jpg";
+import FifthMovie from "../assets/FifthMovie.jpg";
+import SixthMovie from "../assets/SixthMovie.jpg";
 import { useState, useEffect } from "react";
 import { UserAtom } from "../Atoms/UserAtom";
 import { useNavigate, useParams } from "react-router-dom";
@@ -52,8 +54,10 @@ const FilmDetail: React.FC = () => {
   const thumbnailMap: { [title: string]: string } = {
     "Safe Space": FirstMovie,
     "Love As We Know It": SecondMovie,
-    "Love As We Know It – Part 2": ThirdMovie,
+    "Love As We Know It - Part 2": ThirdMovie,
     "A Day Of My Life In The City": FourthMovie,
+    "The Stock Saga": FifthMovie,
+    "Who Am I": SixthMovie,
   };
 
   const getThumbnailPath = (title: string): string => {
