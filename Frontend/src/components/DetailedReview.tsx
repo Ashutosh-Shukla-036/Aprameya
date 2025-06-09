@@ -36,8 +36,10 @@ const DetailedReview: React.FC = () => {
     const filmOptions = [
         "Safe Space",
         "Love As We Know It",
-        "Love As We Know It – Part 2",
+        "Love As We Know It - Part 2",
         "A Day Of My Life In The City",
+        "The Stock Saga",
+        "Who Am I",
     ];
 
     // Fetch reviews
